@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能视觉检测系统 - 检测记录展示</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .back {
+      margin-bottom: 20px;
+    }
+
+    .back a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+
+    .back a:hover {
+      opacity: 0.8;
+      transform: translateX(-3px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    /* 搜索条样式 */
+    .search-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
+
+    .search-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .search-item label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .search-input {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .search-btn {
+      height: 38px;
+      padding: 0 20px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .reset-btn {
+      height: 38px;
+      padding: 0 18px;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #666;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    /* 统计卡片 */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 25px;
+      border-radius: 16px;
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card .num {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px;
+      margin-top: 20px;
+    }
+
+    .table thead th {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 16px 20px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+    }
+
+    .table thead th:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+
+    .table thead th:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    .table tbody tr {
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .table tbody tr:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.15);
+    }
+
+    .table tbody td {
+      padding: 16px 20px;
+      border: none;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .table tbody td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+
+    .table tbody td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    .img-sm {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+
+    .img-sm:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: #fff;
+    }
+
+    .error {
+      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+      color: #fff;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #666;
+      font-size: 16px;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px;
+      color: #999;
+      font-size: 16px;
+    }
+
+    /* 分页 */
+    .pagination {
+      margin-top: 35px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 8px 16px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      color: #333;
+    }
+
+    .pagination button:hover:not([disabled]) {
+      background: #667eea;
+      color: #fff;
+      border-color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .pagination button.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .pagination button[disabled] {
+      background: #f5f5f5;
+      cursor: not-allowed;
+      color: #bbb;
+      border-color: #eee;
+    }
+
+    .pagination .info {
+      font-size: 14px;
+      color: #666;
+      margin: 0 10px;
+      font-weight: 500;
+    }
+
+    .jump-input {
+      width: 60px;
+      height: 36px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .jump-input:focus {
+      border-color: #667eea;
+    }
+
+    .jump-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #667eea;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+<div id="app" class="app">
+  <div class="back">
+    <a href="index.html">← 返回上传页面</a>
+  </div>
+  <div class="header">
+    <h1>智能视觉检测系统</h1>
+    <p>鸿蒙端+AI实时检测记录管理（支持多条件搜索+分页）</p>
+  </div>
+
+  <div class="card">
+    <!-- ====================== 搜索栏 ====================== -->
+    <div class="search-bar">
+      <div class="search-item" style="width: 100px;">
+        <label>ID</label>
+        <input v-model="query.id" class="search-input" type="number" placeholder="ID">
+      </div>
+      <div class="search-item" style="width: 160px;">
+        <label>设备ID</label>
+        <input v-model="query.deviceId" class="search-input" placeholder="设备ID">
+      </div>
+      <div class="search-item" style="width: 180px;">
+        <label>清晰度 ≥</label>
+        <input v-model="query.clarityMin" class="search-input" type="number" placeholder="最小清晰度">
+      </div>
+      <div class="search-item" style="width: 180px;">
+        <label>清晰度 ≤</label>
+        <input v-model="query.clarityMax" class="search-input" type="number" placeholder="最大清晰度">
+      </div>
+      <div class="search-item" style="width: 180px;">
+        <label>AI检测结果</label>
+        <input v-model="query.aiType" class="search-input" placeholder="如：正常截图">
+      </div>
+      <div class="search-item" style="width: 140px;">
+        <label>检测状态</label>
+        <select v-model="query.aiStatus" class="search-input">
+          <option value="">全部</option>
+          <option value="1">成功</option>
+          <option value="0">失败</option>
+        </select>
+      </div>
+
+      <button class="search-btn" @click="search" style="margin-left: 8px;">搜索</button>
+      <button class="reset-btn" @click="resetQuery">重置</button>
+    </div>
+
+    <!-- 统计 -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="num">{{ total }}</div>
+        <div class="label">总检测记录</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">{{ pages }}</div>
+        <div class="label">总页数</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">{{ size }}</div>
+        <div class="label">每页条数</div>
+      </div>
+    </div>
+
+    <div v-if="loading" class="loading">数据加载中...</div>
+    <!-- 区分无数据场景 -->
+    <div v-else-if="list.length === 0" class="no-data">
+      {{ hasSearchQuery ? '未找到匹配的检测记录' : '暂无检测记录' }}
+    </div>
+    <table class="table" v-else>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>设备ID</th>
+        <th>检测图片</th>
+        <th>清晰度</th>
+        <th>AI检测结果</th>
+        <th>检测状态</th>
+        <th>创建时间</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="item in list" :key="item.id">
+        <td>{{ item.id }}</td>
+        <td>{{ item.deviceId }}</td>
+        <td><img :src="getFullImageUrl(item.imagePath)" class="img-sm"></td>
+        <td>{{ item.clarity.toFixed(2) }}</td>
+        <td>{{ item.aiType }}</td>
+        <td>
+              <span class="badge" :class="item.aiStatus == 1 ? 'success' : 'error'">
+                {{ item.aiStatus == 1 ? '检测成功' : '检测失败' }}
+              </span>
+        </td>
+        <td>{{ item.createTime }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- 分页 + 跳转 -->
+    <div class="pagination" v-if="total > 0">
+      <button @click="prevPage" :disabled="current === 1">上一页</button>
+      <button v-for="num in pageNumbers" :key="num" @click="goPage(num)" :class="{ active: current === num }">
+        {{ num }}
+      </button>
+      <button @click="nextPage" :disabled="current >= pages">下一页</button>
+
+      <span class="info">前往</span>
+      <input type="number" v-model="jumpPage" class="jump-input" min="1" :max="pages" @keyup.enter="goToPage">
+      <button class="jump-btn" @click="goToPage">跳转</button>
+
+      <span class="info">共 {{ total }} 条 / {{ pages }} 页</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const app = Vue.createApp({
+    data() {
+      return {
+        list: [],
+        loading: true,
+        baseUrl: "http://10.190.189.181:8080",
+        apiUrl: "http://10.190.189.181:8080/api/image/page",
+
+        current: 1,
+        size: 10,
+        total: 0,
+        pages: 0,
+        jumpPage: "",
+
+        // 搜索条件
+        query: {
+          id: "",
+          deviceId: "",
+          clarityMin: "",
+          clarityMax: "",
+          aiType: "",
+          aiStatus: ""
+        }
+      }
+    },
+    mounted() {
+      this.loadData()
+    },
+    computed: {
+      pageNumbers() {
+        const pages = this.pages
+        const current = this.current
+        const maxShow = 5
+        let start = Math.max(1, current - 2)
+        let end = Math.min(pages, current + 2)
+        const arr = []
+        for (let i = start; i <= end; i++) arr.push(i)
+        return arr
+      },
+      // 判断是否有搜索条件
+      hasSearchQuery() {
+        return Object.values(this.query).some(v => v !== "" && v !== null)
+      }
+    },
+    methods: {
+      async loadData() {
+        try {
+          this.loading = true
+          // 🔥 关键：每次加载前强制清空旧数据，绝对不会混合！
+          this.list = []
+          const params = new URLSearchParams()
+          params.append("current", this.current)
+          params.append("size", this.size)
+
+          // 强制打印搜索条件
+          console.log("=== 前端搜索条件 ===")
+          console.log("id:", this.query.id)
+          console.log("deviceId:", this.query.deviceId)
+          console.log("clarityMin:", this.query.clarityMin)
+          console.log("clarityMax:", this.query.clarityMax)
+          console.log("aiType:", this.query.aiType)
+          console.log("aiStatus:", this.query.aiStatus)
+
+          // 拼接搜索条件（修复所有坑）
+          if (this.query.id !== "") params.append("id", this.query.id)
+          if (this.query.deviceId) params.append("deviceId", this.query.deviceId)
+          if (this.query.clarityMin !== "") params.append("clarityMin", this.query.clarityMin)
+          if (this.query.clarityMax !== "") params.append("clarityMax", this.query.clarityMax)
+          if (this.query.aiType) params.append("aiType", this.query.aiType)
+          if (this.query.aiStatus !== "") {
+            params.append("aiStatus", this.query.aiStatus)
+          }
+
+          const url = `${this.apiUrl}?${params.toString()}`
+          console.log("=== 请求URL ===")
+          console.log(url)
+
+          const res = await fetch(url)
+          const result = await res.json()
+
+          this.list = result.content || []
+          this.total = result.totalElements || 0
+          this.pages = result.totalPages || 0
+        } catch (err) {
+          alert("加载失败：" + err.message)
+          console.error(err)
+        } finally {
+          this.loading = false
+        }
+      },
+
+      // 搜索：不重置页码，保留当前页搜索
+      search() {
+        this.loadData()
+      },
+
+      // 重置：清空条件并回到第1页
+      resetQuery() {
+        this.query = {
+          id: "",
+          deviceId: "",
+          clarityMin: "",
+          clarityMax: "",
+          aiType: "",
+          aiStatus: ""
+        }
+        this.current = 1
+        this.loadData()
+      },
+
+      prevPage() { this.current--; this.loadData() },
+      nextPage() { this.current++; this.loadData() },
+      goPage(page) { this.current = page; this.loadData() },
+      goToPage() {
+        let p = parseInt(this.jumpPage)
+        if (!p) return
+        p = Math.max(1, Math.min(p, this.pages))
+        this.current = p
+        this.jumpPage = ""
+        this.loadData()
+      },
+
+      getFullImageUrl(path) {
+        if (!path) return ""
+        const fileName = path.split(/[\\/]/).pop()
+        return this.baseUrl + "/api/image/image/" + fileName
+      }
+    }
+  })
+  app.mount("#app")
+</script>
+</body>
+
+</html>
