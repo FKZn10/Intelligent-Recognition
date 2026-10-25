@@ -1,0 +1,20 @@
+{
+  "network-security-config": {
+    "domain-config": [
+      {
+        "domains": [
+          {
+            "include-subdomains": true,
+            "name": "10.149.231.234"
+          },
+          {
+            "include-subdomains": true,
+            "name": "192.168.1.214"
+          }
+        ],
+        "cleartext-traffic-permitted": true
+      }
+    ],
+    "cleartext-traffic-permitted": false
+  }
+}

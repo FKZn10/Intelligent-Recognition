@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "permission_internet_reason",
+      "value": "需要访问网络以上传图片"
+    },
+    {
+      "name": "permission_camera_reason",
+      "value": "需要使用相机进行拍照"
+    },
+    {
+      "name": "permission_microphone_reason",
+      "value": "需要使用麦克风录制声音"
+    },
+    {
+      "name": "permission_read_media_reason",
+      "value": "需要读取媒体文件以获取拍摄的照片"
+    },
+    {
+      "name": "permission_write_media_reason",
+      "value": "需要写入媒体文件以保存拍摄的照片"
+    },
+    {
+      "name": "permission_read_imagevideo_reason",
+      "value": "需要读取图片和视频文件以进行推流"
+    },
+    {
+      "name": "permission_write_imagevideo_reason",
+      "value": "需要写入图片和视频文件以保存推流录像"
+    },
+    {
+      "name": "permission_media_location_reason",
+      "value": "需要访问媒体文件的位置信息"
+    }
+  ]
+}
